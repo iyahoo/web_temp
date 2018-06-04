@@ -9,10 +9,11 @@
             [ring.adapter.jetty :refer [run-jetty]]
             [ring.util.response :as res]
             [ring.util.request :refer [body-string]]
+            [ring.component.jetty :refer [jetty-server]]
+            [com.stuartsierra.component :as component]
             [hiccup.core :as hc :refer [html]]
-            [bidi.ring :refer [make-handler]]))
-
-(defonce server (atom nil))
+            [bidi.ring :refer [make-handler]]
+            [environ.core :as environ]))
 
 (defn anti-forgery-script-tag []
   ;; cljsのjs/antiForgeryTokenにトークンを束縛する。
@@ -74,7 +75,7 @@
                   ["index.html" index]
                   [true notfound-handler]]]))
 
-(def app
+(def wrapped-app
   (-> handler
       wrap-restful-format
       wrap-anti-forgery
@@ -83,28 +84,34 @@
       (wrap-resource "public")
       wrap-content-type))
 
+(defn http-server [opt]
+  (jetty-server opt))
 
+(def initial-env
+  {:app-port 3450
+   :absolute-uri ""})
 
-(defn start-server [& {:keys [host port join?]
-                       :or {host "localhost" port 3450 join? false}}]
-  (let [port (cond (integer? port) port
-                   (string? port) (Integer/parseInt port)
-                   :else 3450)
-        opts {:host host
-              :port port
-              :join? join?}]
-    (prn :opts opts)
-    (reset! server
-            (run-jetty #'app opts))))
+(defonce env
+  (merge initial-env environ/env))
 
+(def default-server-opt
+  {:app {:handler wrapped-app}
+   :port (:app-port env)})
 
+(defn create-system [server-opt]
+  (component/system-map
+   :server (http-server (merge default-server-opt server-opt))))
+
+(def main-system
+  (atom (create-system {})))
+
+(defn start-server
+  ([server-opt]
+   (reset! main-system (create-system server-opt))
+   (start-server))
+  ([]
+   (swap! main-system component/start)))
 
 (defn stop-server []
-  (.stop @server)
-  (reset! server nil))
-
-
-
-(defn restart-server []
-  (when @server (stop-server))
-  (start-server))
+  (swap! main-system component/stop)
+  (prn "web_temp.clj.core system stop"))

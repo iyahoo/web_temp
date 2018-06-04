@@ -12,13 +12,17 @@
                  [ring/ring-core "1.7.0-RC1"]
                  [ring/ring-jetty-adapter "1.7.0-RC1"]
                  [ring/ring-anti-forgery "1.3.0"]
+                 [ring-jetty-component "0.3.1"]
                  [ring-middleware-format "0.7.2"]
                  [bidi "2.1.2"]
                  [hiccup "1.0.5"]
                  [reagent "0.8.1"]
-                 [org.slf4j/slf4j-nop "1.7.13" :scope "test"]]
+                 [org.slf4j/slf4j-nop "1.7.13" :scope "test"]
+                 [com.stuartsierra/component "0.3.2"]
+                 [environ "1.1.0"]]
 
   :main user
+  :uberjar-name "web_temp.jar"
 
   :plugins [[lein-figwheel "0.5.16"]
             [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]
@@ -26,7 +30,7 @@
 
   :source-paths ["src"]
 
-  :clean-targets ^{:protect false} [:target-path]
+  :clean-targets ^{:protect false} [:compile-path :target-path]
 
   :cljsbuild {:builds
               [{:id "dev"
@@ -113,8 +117,11 @@
                    ;; :plugins [[cider/cider-nrepl "0.12.0"]]
                    :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
                    ;; need to add the compliled assets to the :clean-targets
-                   :clean-targets ^{:protect false} ["resources/public/js/compiled"
-                                                     :target-path]}}
+                   :clean-targets ^{:protect false} [:compile-path :target-path]}
+             :uberjar {:source-paths ^:replace ["src/"]
+                       :prep-tasks ["compile" ["cljsbuild" "once"]]
+                       :aot :all
+                       :main web_temp.clj.main}}
 
   :sass {:source-paths ["src/web_temp/sass"]
          :target-path "resources/public/css"
