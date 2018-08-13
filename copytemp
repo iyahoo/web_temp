@@ -1,0 +1,5 @@
+#!/bin/zsh
+cp -r ./web_temp $1
+mv ./$1/src/web_temp ./$1/src/$1
+ag -l web_temp $1 | xargs perl -pi -e s/web_temp/$1/g
+rm -rf $1/.git
