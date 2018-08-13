@@ -56,5 +56,6 @@
 
 (defn reload []
   (stop)
+  (reset! stls [])
   (load-file "src/web_temp/core.clj")
   (start))
