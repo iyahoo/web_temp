@@ -1,0 +1,2 @@
+#!/bin/sh
+scp target/web_temp-0.1.0-SNAPSHOT-standalone.jar impsup-furukawa:~/furukawa-app

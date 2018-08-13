@@ -1,0 +1,4 @@
+#!/bin/bash
+
+SYSTEM_MODE=build PORT=3500 lein run
+

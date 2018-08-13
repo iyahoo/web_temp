@@ -1,0 +1,13 @@
+#!/bin/sh
+echo "lein clean" && \
+    lein clean && \
+    echo "rm out" && \
+    rm -rf resources/pubilc/out && \
+    echo "build lein run" && \
+    SYSTEM_MODE=build lein run && \
+    echo "uberjar" && \
+    lein uberjar && \
+    echo "run server" && \
+    SYSTEM_MODE=production PORT=52393 java -jar target/web_temp-0.1.0-SNAPSHOT-standalone.jar && \
+    echo "open browser" && \
+    open http://localhost:52393

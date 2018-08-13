@@ -1,0 +1,4 @@
+#!/bin/bash
+
+SYSTEM_MODE=dev PORT=3500 lein repl
+

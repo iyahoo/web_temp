@@ -1,0 +1,4 @@
+#!/bin/bash
+
+PORT=3500 lein run
+
