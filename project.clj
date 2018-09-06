@@ -11,4 +11,6 @@
 
   :main ^:skip-aot web_temp.core
 
+  :clean-targets^{:protect false} [:target-path "resources/public/out"]
+
   :profiles {:uberjar {:aot :all}})
